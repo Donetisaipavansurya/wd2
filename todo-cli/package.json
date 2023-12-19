@@ -1,0 +1,23 @@
+{
+  "name": "hello-world",
+  "version": "1.0.0",
+  "main": "todo.js",
+  "scripts": {
+    "test": "jest",
+    "prepare": "cd .. && husky install todo-cli/.husky"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint",
+      "prettier --write ."
+    ]
+  },
+  "keywords": [],
+  "author": "nandini",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "jest": "^29.7.0"
+  }
+}
