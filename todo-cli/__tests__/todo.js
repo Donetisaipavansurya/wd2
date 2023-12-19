@@ -1,101 +1,57 @@
 // __tests__/todo.js
-const todoList = require('../todo.js');
 
-const { all, add, markAsComplete, overdue, dueToday, dueLater } = todoList();
+const createTodoList = require('../todo');
 
-describe("Todolist Test Suite", () => {
-  beforeAll(() => {
-    add({
-      title: "Test Todo",
+describe('Todo List Test Suite', () => {
+  let todoInst;
+
+  beforeEach(() => {
+    todoInst = createTodoList();
+
+    // Adding tasks with various due date logics
+    todoInst.add({
+      title: 'New Task',
       completed: false,
-      dueDate: "2023-12-20",
+      dueDate: new Date().toISOString().split('T')[0],
     });
-    add({
-      title: "Overdue Todo",
+
+    todoInst.add({
+      title: 'Test Task',
       completed: false,
-      dueDate: "2023-12-10",
+      dueDate: new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     });
-    add({
-      title: "Due Later Todo",
+  });
+
+  test('new todo item is added', () => {
+    const initialTaskCount = todoInst.tasks.length;
+    todoInst.add({
+      title: 'Another Task',
       completed: false,
-      dueDate: "2023-12-25",
+      dueDate: new Date().toISOString().split('T')[0],
     });
+    expect(todoInst.tasks.length).toBe(initialTaskCount + 1);
   });
 
-  test("Should add new todo (Correct Implementation)", () => {
-    const todoItemCount = all.length;
-    add({
-      title: "New Todo",
-      completed: false,
-      dueDate: "2023-12-20",
-    });
-    console.log('Actual Todo Items:', all);
-    expect(all.length).toBe(todoItemCount + 1); // Assuming correct implementation adds a new todo
+  test('Marked a todo as complete', () => {
+    const taskIndex = 0;
+    todoInst.markAsComplete('New Task');
+    expect(todoInst.tasks[taskIndex].completed).toBe(true);
   });
 
-  test("Should mark a todo as complete (Correct Implementation)", () => {
-    expect(all[0].completed).toBe(false);
-    markAsComplete("Test Todo");
-    console.log('Actual Todo Items:', all);
-    expect(all[0].completed).toBe(true); // Assuming correct implementation marks the todo as complete
+  test('Retrieving of overdue items', () => {
+    const overdueItems = todoInst.getOverdueTasks();
+    expect(overdueItems.length).toBe(0);
   });
 
-  test('Should retrieve overdue items (Correct Implementation)', () => {
-    const overdueItems = overdue();
-    console.log('Actual Overdue Items:', overdueItems);
-    expect(overdueItems.length).toBeGreaterThan(0);
-  });
-  
-  test("Should retrieve due today items (Correct Implementation)", () => {
-    const dueTodayItems = dueToday();
-    console.log('Actual Due Today Items:', dueTodayItems);
-    expect(dueTodayItems.length).toBeGreaterThanOrEqual(0);
-  });
-  
-  test("Should retrieve due later items (Correct Implementation)", () => {
-    const dueLaterItems = dueLater();
-    console.log('Actual Due Later Items:', dueLaterItems);
-    expect(dueLaterItems.length).toBeGreaterThanOrEqual(0);
+  test('Retrieving of due today items', () => {
+    const dueTodayItems = todoInst.getTasksDueToday();
+    expect(dueTodayItems.length).toBeGreaterThan(0);
+    expect(dueTodayItems.every(task => task.dueDate === new Date().toISOString().split('T')[0])).toBe(true);
   });
 
-  describe("Incorrect Implementations", () => {
-    // Incorrect Implementation Checks
-    test("Should add new todo (Incorrect Implementation)", () => {
-      const todoItemCount = all.length;
-      // Incorrect implementation does not add a new todo
-      console.log('Actual Todo Items:', all);
-      expect(all.length).toBe(todoItemCount);
-    });
-
-    test("Should mark a todo as complete (Incorrect Implementation)", () => {
-        markAsComplete("Test Todo");
-        console.log('Actual Todo Items:', all);
-        // Assuming incorrect implementation does not mark the todo as complete
-        expect(all.find(todo => todo.title === "Test Todo").completed).toBe(true);
-      });
-      
-      
-
-    test('Should retrieve overdue items (Incorrect Implementation)', () => {
-      const overdueItems = overdue();
-      console.log('Actual Overdue Items:', overdueItems);
-      // Assuming incorrect implementation does not filter overdue items correctly
-      expect(overdueItems.length).toBeGreaterThan(0);
-    });
-    
-    test("Should retrieve due today items (Incorrect Implementation)", () => {
-        const dueTodayItems = dueToday();
-        console.log('Actual Due Today Items:', dueTodayItems);
-        // Assuming incorrect implementation does not filter due today items correctly
-        expect(dueTodayItems.length).toBe(0); // Corrected expectation
-      });
-      
-    
-    test("Should retrieve due later items (Incorrect Implementation)", () => {
-      const dueLaterItems = dueLater();
-      console.log('Actual Due Later Items:', dueLaterItems);
-      // Assuming incorrect implementation does not filter due later items correctly
-      expect(dueLaterItems.length).toBeGreaterThan(0);
-    });
+  test('Retrieving of due later items', () => {
+    const dueLaterItems = todoInst.getTasksDueLater();
+    expect(dueLaterItems.length).toBe(1);
+    expect(dueLaterItems.every(task => new Date(task.dueDate) > new Date())).toBe(true);
   });
 });

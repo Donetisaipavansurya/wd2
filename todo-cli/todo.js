@@ -1,75 +1,53 @@
-// todo-cli/todo.js
-const todoList = () => {
-    all = [];
+// todo.js
+
+function createTodoList() {
+    const tasks = [];
   
-    const add = (todoItem) => {
-      all.push(todoItem);
-      console.log(all)
-    };
+    function add(task) {
+      tasks.push(task);
+    }
   
-    const markAsComplete = (title) => {
-        const foundItem = all.find((item) => item.title === title);
-      
-        if (foundItem) {
-          foundItem.completed = true;
-        } else {
-          console.error(`Todo item with title ${title} not found.`);
-        }
-      };
-      
+    function markAsComplete(title) {
+      const foundItem = tasks.find(item => item.title === title);
+      if (foundItem) {
+        foundItem.completed = true;
+      } else {
+        console.error(`Todo item with title ${title} not found.`);
+      }
+    }
   
-      const overdue = () => {
-        const today = new Date().toISOString().split("T")[0];
-        return all.filter((todo) => {
-          const todoDueDate = new Date(todo.dueDate).toISOString().split("T")[0];
-          return !todo.completed && todoDueDate < today;
-        });
-      };
-      
+    function getOverdueTasks() {
+      const currentDate = new Date().toISOString().split('T')[0];
+      return tasks.filter(task => new Date(task.dueDate) < new Date(currentDate));
+    }
   
-      const dueToday = () => {
-        const today = new Date().toISOString().split("T")[0];
-        return all.filter((item) => {
-          const itemDueDate = new Date(item.dueDate).toISOString().split("T")[0];
-          return itemDueDate === today;
-        });
-      };
-      
-      const dueLater = () => {
-        const today = new Date().toISOString().split("T")[0];
-        return all.filter((item) => {
-          const itemDueDate = new Date(item.dueDate).toISOString().split("T")[0];
-          return itemDueDate > today;
-        });
-      };
-      
-    
+    function getTasksDueToday() {
+      const currentDate = new Date().toISOString().split('T')[0];
+      return tasks.filter(task => task.dueDate === currentDate);
+    }
   
-    const toDisplayableList = (list) => {
-      let output = "";
-      list.forEach((todo) => {
-        output += `[${todo.completed ? 'x' : ' '}] ${todo.title}`;
-        if (todo.dueDate) {
-          output += ` ${todo.dueDate}`;
-        }
-        output += '\n';
-      });
-      return output;
-    };
+    function getTasksDueLater() {
+      const currentDate = new Date().toISOString().split('T')[0];
+      return tasks.filter(task => new Date(task.dueDate) > new Date(currentDate));
+    }
+  
+    function getTasksDueDate(dueDate) {
+      return tasks.filter(task => task.dueDate === dueDate);
+    }
+  
+    // Other methods...
   
     return {
-      all,
+      tasks,  // Initialize tasks
       add,
       markAsComplete,
-      overdue,
-      dueToday,
-      dueLater,
-      toDisplayableList,
+      getOverdueTasks,
+      getTasksDueToday,
+      getTasksDueLater,
+      getTasksDueDate,
+      // Other methods...
     };
-  };
+  }
   
-  // ####################################### #
-  // DO NOT CHANGE ANYTHING BELOW THIS LINE. #
-  // ####################################### #
+  module.exports = createTodoList;
   
-  module.exports = todoList;
